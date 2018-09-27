@@ -57,7 +57,7 @@ def handle_block_names(stage, block):
     return conv_name, bn_name, relu_name, sc_name
 
 
-def basic_identity_block(filters, stage, block):
+def basic_identity_block(filters, stage, block, skip_scse=False):
     """The identity block is the block that has no conv layer at shortcut.
     # Arguments
         kernel_size: default 3, the kernel size of
@@ -83,14 +83,15 @@ def basic_identity_block(filters, stage, block):
         x = Activation('relu', name=relu_name + '2')(x)
         x = ZeroPadding2D(padding=(1, 1))(x)
         x = Conv2D(filters, (3, 3), name=conv_name + '2', **conv_params)(x)
-        x = channel_spatial_squeeze_excite_block(x)
+        if not skip_scse:
+            x = channel_spatial_squeeze_excite_block(x)
         x = Add()([x, input_tensor])
         return x
 
     return layer
 
 
-def basic_conv_block(filters, stage, block, strides=(2, 2)):
+def basic_conv_block(filters, stage, block, strides=(2, 2), skip_scse=False):
     """The identity block is the block that has no conv layer at shortcut.
     # Arguments
         input_tensor: input tensor
@@ -120,14 +121,15 @@ def basic_conv_block(filters, stage, block, strides=(2, 2)):
         x = Conv2D(filters, (3, 3), name=conv_name + '2', **conv_params)(x)
 
         shortcut = Conv2D(filters, (1, 1), name=sc_name, strides=strides, **conv_params)(shortcut)
-        shortcut = channel_spatial_squeeze_excite_block(shortcut)
+        if not skip_scse:
+            shortcut = channel_spatial_squeeze_excite_block(shortcut)
         x = Add()([x, shortcut])
         return x
 
     return layer
 
 
-def conv_block(filters, stage, block, strides=(2, 2)):
+def conv_block(filters, stage, block, strides=(2, 2), skip_scse=False):
     """The identity block is the block that has no conv layer at shortcut.
     # Arguments
         input_tensor: input tensor
@@ -160,14 +162,15 @@ def conv_block(filters, stage, block, strides=(2, 2)):
         x = Conv2D(filters*4, (1, 1), name=conv_name + '3', **conv_params)(x)
 
         shortcut = Conv2D(filters*4, (1, 1), name=sc_name, strides=strides, **conv_params)(shortcut)
-        shortcut = channel_spatial_squeeze_excite_block(shortcut)
+        if not skip_scse:
+            shortcut = channel_spatial_squeeze_excite_block(shortcut)
         x = Add()([x, shortcut])
         return x
 
     return layer
 
 
-def identity_block(filters, stage, block):
+def identity_block(filters, stage, block, skip_scse=False):
     """The identity block is the block that has no conv layer at shortcut.
     # Arguments
         kernel_size: default 3, the kernel size of
@@ -196,7 +199,8 @@ def identity_block(filters, stage, block):
         x = BatchNormalization(name=bn_name + '3', **bn_params)(x)
         x = Activation('relu', name=relu_name + '3')(x)
         x = Conv2D(filters*4, (1, 1), name=conv_name + '3', **conv_params)(x)
-        x = channel_spatial_squeeze_excite_block(x)
+        if not skip_scse:
+            x = channel_spatial_squeeze_excite_block(x)
         x = Add()([x, input_tensor])
         return x
 

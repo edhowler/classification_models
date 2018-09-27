@@ -88,7 +88,7 @@ def build_scseresnet(
                 x = conv_block(filters, stage, block, strides=(2, 2))(x)
                 
             else:
-                x = identity_block(filters, stage, block)(x)
+                x = identity_block(filters, stage, block, stage == len(repetitions) - 1)(x)
                 
     x = BatchNormalization(name='bn1', **bn_params)(x)
     x = Activation('relu', name='relu1')(x)
