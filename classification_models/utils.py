@@ -23,7 +23,7 @@ def load_model_weights(weights_collection, model, dataset, classes, include_top)
                                 cache_subdir='models',
                                 md5_hash=weights['md5'])
 
-        model.load_weights(weights_path)
+        model.load_weights(weights_path, by_name=by_name)
 
     else:
         raise ValueError('There is no weights for such configuration: ' +

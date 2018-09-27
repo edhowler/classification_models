@@ -1,5 +1,5 @@
-# Classification models Zoo
-Pretrained classification models for Keras
+# Classification models Zoo (modified)
+Pretrained classification models for Keras modified to use [scSE blocks](https://arxiv.org/pdf/1803.02579.pdf). The weights for scSE blocks are not included (you need to train).
 
 ### Models: 
 - [ResNet](https://arxiv.org/abs/1512.03385) models converted from MXNet:
@@ -31,7 +31,7 @@ import numpy as np
 from skimage.io import imread
 from keras.applications.imagenet_utils import decode_predictions
 
-from classification_models import ResNet18
+from classification_models import SCSEResNet18
 from classification_models.resnet import preprocess_input
 
 # read and prepare image
@@ -40,7 +40,7 @@ x = preprocess_input(x, size=(224,224))
 x = np.expand_dims(x, 0)
 
 # load model
-model = ResNet18(input_shape=(224,224,3), weights='imagenet', classes=1000)
+model = SCSEResNet18(input_shape=(224,224,3), weights='imagenet', classes=1000)
 
 # processing image
 y = model.predict(x)
@@ -52,7 +52,7 @@ print(decode_predictions(y))
 Model fine-tuning example:
 ```python
 import keras
-from classification_models import ResNet18
+from classification_models import SCSEResNet18
 
 # prepare your data
 X = ...
@@ -61,7 +61,7 @@ y = ...
 n_classes = 10
 
 # build model
-base_model = ResNet18(input_shape=(224,224,3), weights='imagenet', include_top=False)
+base_model = SCSEResNet18(input_shape=(224,224,3), weights='imagenet', include_top=False)
 x = keras.layers.AveragePooling2D((7,7))(base_model.output)
 x = keras.layers.Dropout(0.3)(x)
 output = keras.layers.Dense(n_classes)(x)
